@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 
 from tabs.wifi_list_tab.wifi_item_display import WiFiItemDisplay
-from wifi_logic import scan_wifi, get_manufacturer, parse_security, calculate_channel
 
 class WiFiList:
     def __init__(self, master):
@@ -32,40 +31,20 @@ class WiFiList:
         self.canvas_frame = self.scroll_canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
         self.scroll_frame.bind("<Configure>", self.on_frame_configure)
 
-        # Initial Refresh
-        self.refresh()
-
-    def refresh(self):
-        """
-        Refresh the displayed Wi-Fi networks.
-        """
-        print("Refreshing Wi-Fi networks...")
-        # Clear existing WiFi items
-        for widget in self.scroll_frame.winfo_children():
-            widget.destroy()
-
-        # Fetch WiFi networks
-        networks = scan_wifi()
-        for network in networks:
-            # Extract network details
-            network_details = {
-                "SSID": network.ssid,
-                "MAC": network.bssid,
-                "Signal": network.signal,
-                "Frequency": network.freq // 1000,
-                "Channel": calculate_channel(network.freq // 1000),
-                "Vendor": get_manufacturer(network.bssid),
-                "Security": parse_security(network.akm)
-            }
-
-            # Create a WiFi item display
-            WiFiItemDisplay(self.scroll_frame, network_details)
-
-        self.frame.after(5000, self.refresh)
-
     def on_frame_configure(self, event):
         """
         Adjust the scroll region to fit the content of the frame.
         """
         self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all"))
 
+    def update(self, networks):
+        """
+        Update the displayed Wi-Fi networks.
+        """
+        # Clear existing WiFi items
+        for widget in self.scroll_frame.winfo_children():
+            widget.destroy()
+
+        # Add each network to the list
+        for network in networks:
+            WiFiItemDisplay(self.scroll_frame, network)

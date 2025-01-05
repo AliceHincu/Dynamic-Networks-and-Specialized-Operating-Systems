@@ -2,6 +2,7 @@ from tkinter import ttk
 
 from tabs.channel_graph_tab.channel_graph import ChannelGraph
 from tabs.wifi_list_tab.wifi_list import WiFiList
+from wifi_logic import scan_wifi, get_manufacturer, parse_security, calculate_channel
 
 
 class WiFiAnalyzerApp:
@@ -25,6 +26,39 @@ class WiFiAnalyzerApp:
         # Bind tab switching to adjust window size
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
 
+        # Initial Refresh
+        self.refresh()
+
+    def refresh(self):
+        """
+        Refresh the displayed Wi-Fi networks.
+        """
+        print("Refreshing Wi-Fi networks...")
+
+        # Fetch WiFi networks
+        networks = scan_wifi()
+        network_details_list = []
+
+        for network in networks:
+            # Extract network details
+            network_details = {
+                "SSID": network.ssid,
+                "MAC": network.bssid,
+                "Signal": network.signal,
+                "Frequency": network.freq // 1000,
+                "Channel": calculate_channel(network.freq // 1000),
+                "Vendor": get_manufacturer(network.bssid),
+                "Security": parse_security(network.akm)
+            }
+            network_details_list.append(network_details)
+
+        # Update each tab with the collected data
+        self.wifi_tab.update(network_details_list)
+        self.graph_tab.update(network_details_list)
+
+        # Schedule the next refresh in 5 seconds
+        self.master.after(5000, self.refresh)
+
     def on_tab_change(self, event):
         """
         Dynamically adjust window size based on the selected tab.
@@ -33,4 +67,4 @@ class WiFiAnalyzerApp:
         if selected_tab == 0:  # WiFi List Tab
             self.master.geometry("370x700")  # Set size for WiFi list
         elif selected_tab == 1:  # Channel Graph Tab
-            self.master.geometry("500x400")  # Set size for graph tab
+            self.master.geometry("1000x800")  # Set size for graph tab

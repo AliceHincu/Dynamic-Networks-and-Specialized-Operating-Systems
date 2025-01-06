@@ -1,6 +1,7 @@
 from tkinter import ttk
 
 from tabs.channel_graph_tab.channel_graph import ChannelGraph
+from tabs.packet_sniffer.packet_sniffer import PacketSniffer
 from tabs.wifi_list_tab.wifi_list import WiFiList
 from wifi_logic import scan_wifi, get_manufacturer, parse_security, calculate_channel
 
@@ -22,6 +23,10 @@ class WiFiAnalyzerApp:
         # Add Channel Graph Tab
         self.graph_tab = ChannelGraph(self.notebook)
         self.notebook.add(self.graph_tab.frame, text="Channel Graph")
+
+        # Add Packet Sniffer Tab
+        self.sniffer_tab = PacketSniffer(self.notebook)
+        self.notebook.add(self.sniffer_tab.frame, text="Packet Sniffer")
 
         # Bind tab switching to adjust window size
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
@@ -68,3 +73,5 @@ class WiFiAnalyzerApp:
             self.master.geometry("370x700")  # Set size for WiFi list
         elif selected_tab == 1:  # Channel Graph Tab
             self.master.geometry("1000x800")  # Set size for graph tab
+        elif selected_tab == 2:  # Packet Sniffer Tab
+            self.master.geometry("800x600")  # Set size for sniffer tab

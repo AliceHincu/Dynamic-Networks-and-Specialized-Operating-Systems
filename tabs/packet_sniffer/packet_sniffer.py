@@ -1,3 +1,5 @@
+import time
+
 from scapy.layers.dot11 import Dot11
 from scapy.layers.inet import IP, TCP
 
@@ -47,6 +49,14 @@ class PacketSniffer:
         self.sniffer_thread.daemon = True
         self.sniffer_thread.start()
 
+        # time.sleep(2)
+        # packet = (
+        #         IP(dst="127.0.0.1") /
+        #         TCP(dport=80, sport=12345, flags="S") /  # SYN flag pentru inițiere conexiune
+        #         Raw(load="GET / HTTP/1.1\r\nHost: localhost\r\n\r\n")
+        # )
+        # send(packet)
+
     def stop_sniffing(self):
         """
         Stop sniffing packets.
@@ -78,13 +88,13 @@ class PacketSniffer:
 
         # TCP Header
         if packet.haslayer(TCP):
-            output += process_tcp_header(packet[TCP])
+            output += process_tcp_header(packet[TCP], packet)
 
         # Append packet details to the text area
         self.text_area.insert(tk.END, output)
         self.text_area.see(tk.END)  # Auto-scroll to the bottom
 
-    def stop_filter(self):
+    def stop_filter(self, packet):
         """
         Stop filter for sniffing.
         """
@@ -130,7 +140,7 @@ def process_ip_header(ip_layer):
 
     return output
 
-def process_tcp_header(tcp_layer):
+def process_tcp_header(tcp_layer, packet):
     """
     Extracts details from the TCP header of a packet and formats it into a readable string.
 

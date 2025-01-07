@@ -38,9 +38,9 @@ def classify_signal(signal_strength):
     """
     Classify the signal strength and return a corresponding color
     """
-    if signal_strength >= -65:
+    if signal_strength > -70:
         return "images/wifi-icon-green.png", "#04ff00"
-    elif signal_strength >= -89:
+    elif signal_strength >= -85:
         return "images/wifi-icon-yellow.png", "#fbff00"
     else:
         return "images/wifi-icon-red.png", "#ff2600"

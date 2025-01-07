@@ -80,12 +80,17 @@ class NetworkAuditLogic:
                     self.traffic_data[key] = {"time": [], "bps": [], "protocol": protocol}
 
                 packet_size = len(packet)
-                current_time = time.time()
+                current_time = int(time.time())
                 self.last_active_time[key] = current_time
 
                 # Update traffic data
-                self.traffic_data[key]["time"].append(current_time)
-                self.traffic_data[key]["bps"].append(packet_size * 8)  # Convert bytes to bits
+                # If it's the same packet, add also the new packet
+                if self.traffic_data[key]["time"] and self.traffic_data[key]["time"][-1] == current_time:
+                    self.traffic_data[key]["bps"][-1] += packet_size * 8  # Adaugă dimensiunea în biți
+                else:
+                    # Add new entry
+                    self.traffic_data[key]["time"].append(current_time)
+                    self.traffic_data[key]["bps"].append(packet_size * 8)  # Convert bytes to bits
 
                 # Keep only the last 60 seconds of data
                 if len(self.traffic_data[key]["time"]) > 60:
